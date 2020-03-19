@@ -75,7 +75,7 @@ def _make_github_api_request(url: str) -> dict:
 
 
 def _get_github_deployment_status_url(
-    deployments_url: str, commit_sha: str, timeout: int, interval: int
+        deployments_url: str, commit_sha: str, timeout: int, interval: int
 ) -> None:
     """Get deployment_status URL for the head commit.
         Inputs:
@@ -105,12 +105,12 @@ def _get_github_deployment_status_url(
 
 def _get_build_data(url: str, interval: int) -> dict:
     """Get Review App build data using Github's `deployment_status` API.
-    
+
         Inputs:
             url: Deployment status URL
-            interval: Amount of time (in seconds) to check the build status 
+            interval: Amount of time (in seconds) to check the build status
                     if the status is in pending state.
-        
+
         Output:
             Review App build data
     """
@@ -136,16 +136,16 @@ def _get_build_data(url: str, interval: int) -> dict:
 
 
 def _check_review_app_deployment_status(
-    review_app_url: str, accepted_responses: t.List[int], timeout: int, interval: int
-):
+        review_app_url: str, accepted_responses: t.List[int], timeout: int, interval: int):
     """Check Review App deployment status code against accepted_responses.
-    
+
     Inputs:
         review_app_url: URL of the Review App to be checked.
         accepted_responses: Status codes to be accepted.
         timeout: Maximum time to spend retrying the HTTP response check until it succeeds.
         interval: Interval for each HTTP response check.
     """
+    print(review_app_url)
     if interval > timeout:
         raise ValueError("Interval can't be greater than publish_timeout.")
 
@@ -165,7 +165,7 @@ def _check_review_app_deployment_status(
 
 def main() -> None:
     """Main workflow.
-    
+
     All the inputs are received from workflow as environment variables.
     """
 
@@ -188,12 +188,12 @@ def main() -> None:
     logger.info(f"Statuses being accepted: {args.accepted_responses}")
 
     with open(os.environ["GITHUB_EVENT_PATH"]) as f:
-        pull_request_data = json.load(f)
+        push_data = json.load(f)
 
     # Fetch the GitHub status URL
     github_deployment_status_url = _get_github_deployment_status_url(
-        deployments_url=pull_request_data["repository"]["deployments_url"],
-        commit_sha=pull_request_data["pull_request"]["head"]["sha"],
+        deployments_url=push_data["repository"]["deployments_url"],
+        commit_sha=push_data["after"],
         timeout=args.deployments_timeout,
         interval=args.interval,
     )
@@ -217,7 +217,8 @@ def main() -> None:
         time.sleep(args.load_time_delay)
 
         # Check the HTTP response from app URL
-        review_app_url = f"https://{reviewapp_build_data['environment']}.herokuapp.com"
+        logger.info(f"https://{reviewapp_build_data['environment']}.herokuapp.com")
+        review_app_url = f"https://stagingtestcigit.herokuapp.com/"
         _check_review_app_deployment_status(
             review_app_url=review_app_url,
             accepted_responses=args.accepted_responses,
