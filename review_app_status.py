@@ -218,7 +218,7 @@ def main() -> None:
 
         # Check the HTTP response from app URL
         logger.info(f"https://{reviewapp_build_data['environment']}.herokuapp.com")
-        review_app_url = f"https://stagingtestcigit.herokuapp.com/"
+        review_app_url = f"https://{reviewapp_build_data['environment']}.herokuapp.com"
         _check_review_app_deployment_status(
             review_app_url=review_app_url,
             accepted_responses=args.accepted_responses,
